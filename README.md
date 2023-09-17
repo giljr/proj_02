@@ -52,15 +52,26 @@ Make sure port 80 on the host is not already being in use.
 
 ```
 $ docker compose up -d
-Creating network "nginx-flask-mysql_default" with the default driver
-Pulling db (mysql:8.0.19)...
-5.7: Pulling from library/mysql
+$ docker-compose up -d
+Creating network "proj_02_backnet" with the default driver
+Creating network "proj_02_frontnet" with the default driver
+Creating volume "proj_02_db-data" with default driver
+Pulling db (mariadb:10-focal)...
+10-focal: Pulling from library/mariadb
 ...
-...
+WARNING: Image for service backend was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Building proxy
+[+] Building 2.7s (7/7) FINISHED                                                                                                        docker:desktop-linux
+ => [internal] load build definition from Dockerfile                                                                                                    0.0s
+ => => transferring dockerfile: 100B                                                                                                                    0.0s
+ ...
+
+What's Next?
+  View summary of image vulnerabilities and recommendations → docker scout quickview
 WARNING: Image for service proxy was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
-Creating nginx-flask-mysql_db_1 ... done
-Creating nginx-flask-mysql_backend_1 ... done
-Creating nginx-flask-mysql_proxy_1   ... done
+Creating proj_02_db_1 ... done
+Creating proj_02_backend_1 ... done
+Creating proj_02_proxy_1   ... done
 ```
 
 ## Expected result
@@ -68,16 +79,16 @@ Creating nginx-flask-mysql_proxy_1   ... done
 Listing containers should show three containers running and the port mapping as below:
 ```
 $ docker compose ps
-NAME                          COMMAND                  SERVICE             STATUS              PORTS
-nginx-flask-mysql-backend-1   "flask run"              backend             running             0.0.0.0:8000->8000/tcp
-nginx-flask-mysql-db-1        "docker-entrypoint.s…"   db                  running (healthy)   3306/tcp, 33060/tcp
-nginx-flask-mysql-proxy-1     "nginx -g 'daemon of…"   proxy               running             0.0.0.0:80->80/tcp
+NAME                IMAGE               COMMAND                  SERVICE             CREATED             STATUS                   PORTS
+proj_02_backend_1   proj_02_backend     "flask run"              backend             8 minutes ago       Up 8 minutes             0.0.0.0:8000->8000/tcp
+proj_02_db_1        mariadb:10-focal    "docker-entrypoint.s…"   db                  8 minutes ago       Up 8 minutes (healthy)   3306/tcp, 33060/tcp
+proj_02_proxy_1     proj_02_proxy       "nginx -g 'daemon of…"   proxy               8 minutes ago       Up 8 minutes             0.0.0.0:80->80/tcp
 ```
 
 After the application starts, navigate to `http://localhost:80` in your web browser or run:
 ```
 $ curl localhost:80
-<div>Blog post #1</div><div>Blog post #2</div><div>Blog post #3</div><div>Blog post #4</div>
+[{"id": 1, "code": 65014, "date": "2019-01-12", "store": "Shopping Morumbi", "product": "Aster Pants", "qty": 5, "price": 114}, {"id": 2, "code": 65014, "date": "2019-01-12", "store": "Shopping Morumbi", "product": "Trench Coat", "qty": 1, "price": 269}, {"id": 3, "code": 65016, "date": "2019-01-12", "store": "Iguatemi Campinas", "product": "Peter Pan Collar", "qty": 3, "price": 363}]
 ```
 
 Stop and remove the containers
